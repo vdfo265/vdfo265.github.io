@@ -2,12 +2,11 @@ const question = document.getElementById('question'),
       choices = document.getElementsByClassName('choice-text'),
       CORRECT_BONUS = 10,
       MAX_QUESTIONS = 12,
-      scoreText = document.getElementById('score');
-      progressText = document.getElementById('progressText');
+      scoreText = document.getElementById('score'),
+      progressText = document.getElementById('progressText'),
       progressBarFull = document.getElementById('progressBarFull'),
       loader = document.getElementById('loader'),
       game = document.getElementById('game');
-
 
 let currentQuestion = {},
     acceptingAnswers = true,
@@ -16,23 +15,51 @@ let currentQuestion = {},
     availableQuestion = [],
     questions = [];
 
+    
+    function replaceHTMLEntities(text) {
+        const entitiesToReplace = {
+            '&quot;': '"',
+            '&#039;': "'",
+            '&amp;': '&',
+            '&rdquo;': '"',
+            '&ldquo;': '"',
+            '&ouml;': 'ö',
+            '&auml;': 'ä',
+            '&aring;': 'a'
+    
+        },
+        regexPattern = new RegExp(Object.keys(entitiesToReplace).join('|'), 'g');
+    
+        return text.replace(regexPattern, match => entitiesToReplace[match]);
+    }
+
 fetch('https://opentdb.com/api.php?amount=15&category=9&difficulty=medium&type=multiple')
-    .then(res => {
-        return res.json();
-    })
+    .then(res => res.json())
     .then(loadedQuestions => {
-        questions = loadedQuestions.results.map (loadedQuestion => {
+        questions = loadedQuestions.results.map(loadedQuestion => {
             const formattedQuestion = {
-                question: loadedQuestion.question
+                question: replaceHTMLEntities(loadedQuestion.question),
             };
 
-            const answerChoices = [...loadedQuestion.incorrect_answers];
-            formattedQuestion.answer = Math.floor(Math.random()*3) + 1;
+            //! new
+            const answerChoices = loadedQuestion.incorrect_answers.map(answer => replaceHTMLEntities(answer));
+            formattedQuestion.answer = Math.floor(Math.random() * 3) + 1;
+
             answerChoices.splice(
-                formattedQuestion.answer -1,
-                0, 
-                loadedQuestion.correct_answer
+                formattedQuestion.answer - 1,
+                0,
+                replaceHTMLEntities(loadedQuestion.correct_answer)
             );
+
+            //! old
+            // const answerChoices = [...loadedQuestion.incorrect_answers];
+            // formattedQuestion.answer = Math.floor(Math.random()*3) + 1;
+
+            // answerChoices.splice(
+            //     formattedQuestion.answer -1,
+            //     0, 
+            //     replaceHTMLEntities(loadedQuestion.correct_answer)
+            // );
 
             answerChoices.forEach((choice, index) => {
                 formattedQuestion['choice' + (index+1)] = choice;
@@ -46,7 +73,6 @@ fetch('https://opentdb.com/api.php?amount=15&category=9&difficulty=medium&type=m
         startGame();
     })
     .catch(err => {
-
     });
 
 startGame = () => {
@@ -95,12 +121,13 @@ Array.from(choices).forEach((choice) => {
         if (classToApply === 'correct') {
             incrementScore(CORRECT_BONUS);
         };
-        
+
         selectedChoice.parentElement.classList.add(classToApply);
+
         setTimeout( () => {
             selectedChoice.parentElement.classList.remove(classToApply);
             getNewQuestion();
-        }, 1000);
+        }, 1250);
     });
 });
 
