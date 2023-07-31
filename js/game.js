@@ -15,23 +15,36 @@ let currentQuestion = {},
     availableQuestion = [],
     questions = [];
 
-    
-    function replaceHTMLEntities(text) {
-        const entitiesToReplace = {
-            '&quot;': '"',
-            '&#039;': "'",
-            '&amp;': '&',
-            '&rdquo;': '"',
-            '&ldquo;': '"',
-            '&ouml;': 'ö',
-            '&auml;': 'ä',
-            '&aring;': 'a'
-    
-        },
-        regexPattern = new RegExp(Object.keys(entitiesToReplace).join('|'), 'g');
-    
-        return text.replace(regexPattern, match => entitiesToReplace[match]);
-    }
+
+function replaceHTMLEntities(text) {
+    const entitiesToReplace = {
+        '&quot;': '"',
+        '&#039;': "'",
+        '&amp;': '&',
+        '&rdquo;': '"',
+        '&ldquo;': '"',
+        '&ouml;': 'ö',
+        '&auml;': 'ä',
+        '&aring;': 'a'
+
+    },
+    regexPattern = new RegExp(Object.keys(entitiesToReplace).join('|'), 'g');
+
+    return text.replace(regexPattern, match => entitiesToReplace[match]);
+}
+
+//!!!!! NEEEEEEEEEWWWWWWW
+function showCorrectAnswer() {
+    const correctChoiceNumber = currentQuestion.answer;
+    const correctChoiceElement = document.querySelector(`[data-number="${correctChoiceNumber}"]`);
+    correctChoiceElement.parentElement.classList.add('correct');
+
+    setTimeout( () => {
+        correctChoiceElement.parentElement.classList.remove('correct');
+    }, 1250);
+}
+//!  ------------------------------
+
 
 fetch('https://opentdb.com/api.php?amount=15&category=9&difficulty=medium&type=multiple')
     .then(res => res.json())
@@ -120,7 +133,12 @@ Array.from(choices).forEach((choice) => {
 
         if (classToApply === 'correct') {
             incrementScore(CORRECT_BONUS);
-        };
+        }
+        //! NEEWWWWWWW --------------------
+        else {
+            showCorrectAnswer();
+        }
+        //!  ------------------------------
 
         selectedChoice.parentElement.classList.add(classToApply);
 
