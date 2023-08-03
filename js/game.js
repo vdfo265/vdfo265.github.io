@@ -25,7 +25,9 @@ function replaceHTMLEntities(text) {
         '&ldquo;': '"',
         '&ouml;': 'ö',
         '&auml;': 'ä',
-        '&aring;': 'a'
+        '&aring;': 'a',
+        '&lrm;': '',
+        '&rlm;': ''
 
     },
     regexPattern = new RegExp(Object.keys(entitiesToReplace).join('|'), 'g');
@@ -46,7 +48,7 @@ function showCorrectAnswer() {
 //!  ------------------------------
 
 
-fetch('https://opentdb.com/api.php?amount=15&category=9&difficulty=medium&type=multiple')
+fetch('https://opentdb.com/api.php?amount=15&category=9&type=multiple')
     .then(res => res.json())
     .then(loadedQuestions => {
         questions = loadedQuestions.results.map(loadedQuestion => {
